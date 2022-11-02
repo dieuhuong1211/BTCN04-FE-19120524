@@ -16,12 +16,10 @@ export const Register = (props) => {
     const [username, setName] = useState('');
     const [result, setResult] = useState({ status: '', submit: true });
 
-    const { register, handleSubmit, formState: { errors } } = useForm({
-        criteriaMode: "all"
-    });
+    const { register, handleSubmit } = useForm();
     
     useEffect(() => {
-        console.log("log-24: " + result.status);
+        console.log("log-22: " + result.status);
         if (result.status === "EXISTED") {
             toast("Username '" + username + "' already exists");
             return;
@@ -84,68 +82,4 @@ export const Register = (props) => {
     );
 }
 
-export const Register2 = (props) => {
-
-    const [password, setPass] = useState('');
-    const [username, setName] = useState('');
-
-    const { register, handleSubmit, formState: { errors } } = useForm({
-        criteriaMode: "all"
-    });
-
-    const onSubmit = async () => {
-        let result;
-        await fetch("http://localhost:4000/users/register", {
-            method: "post",
-            body: JSON.stringify({ username, password }),
-            headers: {
-                "Content-Type": "application/json"
-            }
-        })
-            .then((response) => response.json())
-            .then((response) => {
-                result = response.status;
-                console.log(result);
-                console.log(username);
-            });
-        if (result === "EXISTED") {
-            toast("Username '" + username + "' already exists");
-            return;
-        }
-        if (result === "INVALID_INPUT") {
-            toast("Username or Password is missing");
-            return;
-        }
-        if (result === "OK") {
-            toast("Sign Up Success. Username: " + username);
-            return;
-        }
-        else {
-            toast("Something goes wrong!");
-        }
-    }
-
-    return (
-        <div className="auth-form-container">
-            <h2>Register</h2>
-            <form className="register-form" onSubmit={handleSubmit(onSubmit)}>
-                <ToastContainer />
-
-                <label>User name</label>
-                <input {...register("username", {
-                    onChange: (e) => setName(e.target.value),
-                })} placeholder="Your Name" />
-
-                <label>Password</label>
-                <input {...register("password", {
-                    onChange: (e) => setPass(e.target.value),
-                })} placeholder="••••••••" type="password" />
-
-                <button type="submit">Register</button>
-            </form>
-            <button className="link-btn" >Already have an account? Login here.</button>
-
-        </div>
-    );
-}
 
