@@ -10,7 +10,7 @@ function App() {
     <div className="App">
       <BrowserRouter>
       <Routes>
-        <Route path="/BTCN05-FE-19120524" element={<Register />}>
+        <Route path="/BTCN04-FE-19120524" element={<Register />}>
         </Route>
       </Routes>
     </BrowserRouter>
