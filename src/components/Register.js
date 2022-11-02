@@ -37,7 +37,7 @@ export const Register = (props) => {
     }, [result])
 
     const account = useMutation(async () =>
-        await fetch("http://localhost:4000/users/register", {
+        await fetch("https://btcn05-be-19120524.onrender.com/users/register", {
             method: "post",
             body: JSON.stringify({ username, password }),
             headers: {
