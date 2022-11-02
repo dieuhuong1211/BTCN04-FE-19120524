@@ -1,36 +1,151 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useForm } from 'react-hook-form';
+
+import { useMutation } from 'react-query'
+
+async function fetchPosts() {
+    const { data } = await fetch("http://localhost:4000/users/register");
+    return data;
+}
 
 export const Register = (props) => {
 
     const [password, setPass] = useState('');
     const [username, setName] = useState('');
+    const [result, setResult] = useState({ status: '', submit: true });
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        console.log(username, password);
-        let result = await fetch("http://localhost:4000/users/register", {
+    const { register, handleSubmit, formState: { errors } } = useForm({
+        criteriaMode: "all"
+    });
+    
+    useEffect(() => {
+        console.log("log-24: " + result.status);
+        if (result.status === "EXISTED") {
+            toast("Username '" + username + "' already exists");
+            return;
+        }
+        if (result.status === "INVALID_INPUT") {
+            toast("Username or Password is missing");
+            return;
+        }
+        if (result.status === "OK") {
+            toast("Sign Up Success. Username: " + username);
+            return;
+        }
+        toast("Hello!");
+
+    }, [result])
+
+    const account = useMutation(async () =>
+        await fetch("http://localhost:4000/users/register", {
             method: "post",
-            mode: 'no-cors',
             body: JSON.stringify({ username, password }),
             headers: {
                 "Content-Type": "application/json"
             }
-        });
-        // result = result.json();
-        // console.log("result: " + result);
+        })
+            .then((response) => response.json())
+            .then(async (response) => {
+                setResult({
+                    status: response.status,
+                    submit: !result.submit
+                });
+            })
+    );
+
+    const OnSubmit = () => {
+        account.mutate();
+
     }
 
     return (
         <div className="auth-form-container">
             <h2>Register</h2>
-        <form className="register-form" onSubmit={handleSubmit}>
-            <label htmlFor="name">User name</label>
-            <input value={username} onChange={(e) => setName(e.target.value)} type="text" placeholder="your name" id="name" name="name" />
-            <label htmlFor="password">Password</label>
-            <input value={password} onChange={(e) => setPass(e.target.value)} type="password" placeholder="********" id="password" name="password" />
-            <button type="submit">Register</button>
-        </form>
-        <button className="link-btn" onClick={() => props.onFormSwitch('register')}>Already have an account? Login here.</button>
-    </div>
-    )
+            <form className="register-form" onSubmit={handleSubmit(OnSubmit)}>
+                <ToastContainer />
+
+                <label>User name</label>
+                <input {...register("username", {
+                    onChange: (e) => setName(e.target.value),
+                })} placeholder="Your Name" />
+
+                <label>Password</label>
+                <input {...register("password", {
+                    onChange: (e) => setPass(e.target.value),
+                })} placeholder="••••••••" type="password" />
+
+                <button type="submit">Register</button>
+            </form>
+            <button className="link-btn" >Already have an account? Login here.</button>
+
+        </div>
+    );
 }
+
+export const Register2 = (props) => {
+
+    const [password, setPass] = useState('');
+    const [username, setName] = useState('');
+
+    const { register, handleSubmit, formState: { errors } } = useForm({
+        criteriaMode: "all"
+    });
+
+    const onSubmit = async () => {
+        let result;
+        await fetch("http://localhost:4000/users/register", {
+            method: "post",
+            body: JSON.stringify({ username, password }),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                result = response.status;
+                console.log(result);
+                console.log(username);
+            });
+        if (result === "EXISTED") {
+            toast("Username '" + username + "' already exists");
+            return;
+        }
+        if (result === "INVALID_INPUT") {
+            toast("Username or Password is missing");
+            return;
+        }
+        if (result === "OK") {
+            toast("Sign Up Success. Username: " + username);
+            return;
+        }
+        else {
+            toast("Something goes wrong!");
+        }
+    }
+
+    return (
+        <div className="auth-form-container">
+            <h2>Register</h2>
+            <form className="register-form" onSubmit={handleSubmit(onSubmit)}>
+                <ToastContainer />
+
+                <label>User name</label>
+                <input {...register("username", {
+                    onChange: (e) => setName(e.target.value),
+                })} placeholder="Your Name" />
+
+                <label>Password</label>
+                <input {...register("password", {
+                    onChange: (e) => setPass(e.target.value),
+                })} placeholder="••••••••" type="password" />
+
+                <button type="submit">Register</button>
+            </form>
+            <button className="link-btn" >Already have an account? Login here.</button>
+
+        </div>
+    );
+}
+

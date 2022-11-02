@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import logo from './logo.svg';
+import { Routes, Route, BrowserRouter } from "react-router-dom";
+
 import './App.css';
 import { Register } from "./components/Register";
 
@@ -7,10 +8,15 @@ function App() {
 
   return (
     <div className="App">
-      {
-        <Register/>
-      }
+      <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Register />}>
+        </Route>
+      </Routes>
+    </BrowserRouter>
     </div>
+    
+
   );
 }
 
